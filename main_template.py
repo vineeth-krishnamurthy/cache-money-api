@@ -24,8 +24,9 @@ class GenerateBudget(Resource):
         user1 = client_data[0]
         transactions_input = str(user1)
 
-        ai_prompt = "If the user input is related to finances, creating a budget, or saving money your answer should be a budget" \
-                    "that follows this format for every transaction category in transactions input - {budget:{category: dollar amount}} that addresses the user's needs"
+        ai_prompt = "If the user input is related to finances, creating a budget, or saving money, your answer should be a budget that follows this format for every transaction category in the transactions input - {budget:{category: dollar amount}} that addresses the user's needs. The total of the budget should reflect any reduction specified by the user in their input."
+
+        # ai_prompt_2 = "There will always be a savings category. If a savings category does not exist, make sure to create one. Never decrease the dollar amount or percentage allocated to the savings category."
 
         response = client.chat.completions.create(
             model="gpt-3.5-turbo-0125",
@@ -33,6 +34,7 @@ class GenerateBudget(Resource):
             messages=[
                 {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
                 {"role": "system", "content": ai_prompt},
+                # {"role": "system", "content": ai_prompt_2},
                 {"role": "system", "content": transactions_input},
                 {"role": "user", "content": user_message},
             ]

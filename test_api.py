@@ -1,6 +1,6 @@
 import requests
 
-base_url = "https://cache-money-api.onrender.com/generatebudget"
+base_url = "https://cache-money-api.onrender.com/api/generatebudget"
 
 params = {'text': "I want to save $100 next month"}
 
