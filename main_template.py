@@ -10,6 +10,7 @@ from plaid.model.link_token_create_request_statements import LinkTokenCreateRequ
 from dotenv import load_dotenv
 from datetime import date, timedelta
 import os
+from plaid.api import plaid_api
 
 
 load_dotenv()
