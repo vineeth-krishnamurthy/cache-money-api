@@ -15,29 +15,12 @@ class GenerateBudget(Resource):
 
     def get(self):
         """
-        This method responds to the GET request for this endpoint and returns the data in uppercase.
-        ---
-        tags:
-        - Text Processing
-        parameters:
-            - name: text
-              in: query
-              type: string
-              required: true
-              description: The text to be converted to uppercase
+        This method responds to the GET request for this endpoint - calls the openAI api, with a budget response
         responses:
             200:
                 description: A successful GET request
-                content:
-                    application/json:
-                      schema:
-                        type: object
-                        properties:
-                            text:
-                                type: string
-                                description: The text in uppercase
         """
-        text = request.args.get('text')
+        user_message = request.args.get('text')
         user1 = client_data[0]
         transactions_input = str(user1)
 
@@ -46,18 +29,29 @@ class GenerateBudget(Resource):
             response_format={ "type": "json_object" },
             messages=[
                 {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
+                {"role": "system", "content": "If the user input is related to anything other than finances/creating a budget, your answer should be 'Sorry, I can only create budgets :('"},
                 {"role": "user", "content": transactions_input},
-                {"role": "user", "content": "Given these monthly transactions, create a budget for me for next month"}
+                {"role": "user", "content": user_message}
             ]
         )
 
         output = response.choices[0].message.content
 
-        print(output)
-
         return jsonify(output)
 
+class GrabData(Resource):
+
+    def get(self):
+        """
+        This method responds to the GET request for this endpoint, and grabs all the data in our mock database
+        responses:
+            200:
+                description: A successful GET request
+        """
+        return jsonify(client_data)
+
 api.add_resource(GenerateBudget, "/generatebudget")
+api.add_resource(GrabData, "/grabdata")
 
 if __name__ == "__main__":
     app.run(debug=True)
