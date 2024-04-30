@@ -9,6 +9,7 @@ from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUse
 from plaid.model.link_token_create_request_statements import LinkTokenCreateRequestStatements
 from dotenv import load_dotenv
 from datetime import date, timedelta
+import os
 
 
 load_dotenv()
