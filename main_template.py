@@ -25,7 +25,7 @@ class GenerateBudget(Resource):
         transactions_input = str(user1)
 
         ai_prompt = "If the user input is related to finances, creating a budget, or saving money your answer should be a budget" \
-                    "that follows this format- {budget:{category: dollar amount}} that addresses the user's needs"
+                    "that follows this format for every transaction category in transactions input - {budget:{category: dollar amount}} that addresses the user's needs"
 
         response = client.chat.completions.create(
             model="gpt-3.5-turbo-0125",
