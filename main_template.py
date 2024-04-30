@@ -11,6 +11,10 @@ from dotenv import load_dotenv
 from datetime import date, timedelta
 import os
 from plaid.api import plaid_api
+from plaid.model.products import Products
+from plaid.model.country_code import CountryCode
+import time
+from datetime import date, timedelta
 
 
 load_dotenv()
