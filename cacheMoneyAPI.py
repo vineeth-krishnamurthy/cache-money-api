@@ -5,7 +5,6 @@ from openai import OpenAI
 import book_review
 
 # Initializes the connection to openAI
-# client = OpenAI()
 
 app = Flask(__name__)
 api = Api(app)
