@@ -7,6 +7,7 @@ from data.client_data import client_data
 import plaid
 from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUser
 from plaid.model.link_token_create_request_statements import LinkTokenCreateRequestStatements
+from plaid.model.link_token_create_request import LinkTokenCreateRequest
 from dotenv import load_dotenv
 from datetime import date, timedelta
 import os
