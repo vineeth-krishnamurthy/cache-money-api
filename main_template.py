@@ -4,6 +4,87 @@ from flask_restful import Api, Resource
 from flasgger import Swagger
 from openai import OpenAI
 from data.client_data import client_data
+import plaid
+from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUser
+from plaid.model.link_token_create_request_statements import LinkTokenCreateRequestStatements
+from dotenv import load_dotenv
+from datetime import date, timedelta
+
+
+load_dotenv()
+
+# Fill in your Plaid API keys - https://dashboard.plaid.com/account/keys
+PLAID_CLIENT_ID = os.getenv('PLAID_CLIENT_ID')
+PLAID_SECRET = os.getenv('PLAID_SECRET')
+# Use 'sandbox' to test with Plaid's Sandbox environment (username: user_good,
+# password: pass_good)
+# Use `development` to test with live users and credentials and `production`
+# to go live
+PLAID_ENV = os.getenv('PLAID_ENV', 'sandbox')
+# PLAID_PRODUCTS is a comma-separated list of products to use when initializing
+# Link. Note that this list must contain 'assets' in order for the app to be
+# able to create and retrieve asset reports.
+PLAID_PRODUCTS = os.getenv('PLAID_PRODUCTS', 'transactions').split(',')
+
+# PLAID_COUNTRY_CODES is a comma-separated list of countries for which users
+# will be able to select institutions from.
+PLAID_COUNTRY_CODES = os.getenv('PLAID_COUNTRY_CODES', 'US').split(',')
+
+
+def empty_to_none(field):
+    value = os.getenv(field)
+    if value is None or len(value) == 0:
+        return None
+    return value
+
+host = plaid.Environment.Sandbox
+
+if PLAID_ENV == 'sandbox':
+    host = plaid.Environment.Sandbox
+
+if PLAID_ENV == 'development':
+    host = plaid.Environment.Development
+
+if PLAID_ENV == 'production':
+    host = plaid.Environment.Production
+
+# Parameters used for the OAuth redirect Link flow.
+#
+# Set PLAID_REDIRECT_URI to 'http://localhost:3000/'
+# The OAuth redirect flow requires an endpoint on the developer's website
+# that the bank website should redirect to. You will need to configure
+# this redirect URI for your client ID through the Plaid developer dashboard
+# at https://dashboard.plaid.com/team/api.
+PLAID_REDIRECT_URI = empty_to_none('PLAID_REDIRECT_URI')
+
+configuration = plaid.Configuration(
+    host=host,
+    api_key={
+        'clientId': PLAID_CLIENT_ID,
+        'secret': PLAID_SECRET,
+        'plaidVersion': '2020-09-14'
+    }
+)
+api_client = plaid.ApiClient(configuration)
+plaid_client = plaid_api.PlaidApi(api_client)
+
+products = []
+for product in PLAID_PRODUCTS:
+    products.append(Products(product))
+
+# We store the access_token in memory - in production, store it in a secure
+# persistent data store.
+access_token = None
+# The payment_id is only relevant for the UK Payment Initiation product.
+# We store the payment_id in memory - in production, store it in a secure
+# persistent data store.
+payment_id = None
+# The transfer_id is only relevant for Transfer ACH product.
+# We store the transfer_id in memory - in production, store it in a secure
+# persistent data store.
+transfer_id = None
+
+item_id = None
 
 app = Flask(__name__)
 api = Api(app)
@@ -57,6 +138,33 @@ class GrabData(Resource):
 
 api.add_resource(GenerateBudget, "/generatebudget")
 api.add_resource(GrabData, "/grabdata")
+
+@app.route('/api/create_link_token', methods=['POST'])
+def create_link_token():
+    try:
+        request = LinkTokenCreateRequest(
+            products=products,
+            client_name="Plaid Quickstart",
+            country_codes=list(map(lambda x: CountryCode(x), PLAID_COUNTRY_CODES)),
+            language='en',
+            user=LinkTokenCreateRequestUser(
+                client_user_id=str(time.time())
+            )
+        )
+        if PLAID_REDIRECT_URI!=None:
+            request['redirect_uri']=PLAID_REDIRECT_URI
+        if Products('statements') in products:
+            statements=LinkTokenCreateRequestStatements(
+                end_date=date.today(),
+                start_date=date.today()-timedelta(days=30)
+            )
+            request['statements']=statements
+    # create link token
+        response = plaid_client.link_token_create(request)
+        return jsonify(response.to_dict())
+    except plaid.ApiException as e:
+        print(e)
+        return json.loads(e.body)
 
 if __name__ == "__main__":
     app.run(debug=True)
