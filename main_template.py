@@ -28,10 +28,9 @@ class GenerateBudget(Resource):
             model="gpt-3.5-turbo-0125",
             response_format={ "type": "json_object" },
             messages=[
-                {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
-                {"role": "system", "content": "If the user input is related to anything other than finances/creating a budget, your answer should be 'Sorry, I can only create budgets :('"},
-                {"role": "user", "content": transactions_input},
-                {"role": "user", "content": user_message}
+                {"role": "system", "content": "If the user input is related to anything other than finances, creating a budget, or saving money your answer should be 'Sorry, I can only create budgets :('"},
+                {"role": "system", "content": transactions_input},
+                {"role": "user", "content": user_message},
             ]
         )
 
