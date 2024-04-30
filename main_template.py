@@ -151,9 +151,6 @@ class GrabData(Resource):
         return jsonify(client_data)
 
 
-app = Flask(__name__)
-api = Api(app)
-
 class CreateLinkToken(Resource):
     def post(self):
         try:
