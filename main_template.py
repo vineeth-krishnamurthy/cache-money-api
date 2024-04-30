@@ -105,7 +105,7 @@ class GenerateBudget(Resource):
         user1 = client_data[0]
         transactions_input = str(user1)
 
-        ai_prompt = "If the user input is related to finances, creating a budget, or saving money, your answer should be a budget that follows this format for every transaction category in the transactions input - {budget:{category: dollar amount}} that addresses the user's needs, and the sum of the categories in the created budget should reflect any reduction specified by the user in their input. Else, the output should be 'Sorry, I can only create budgets'"
+        ai_prompt = "If the user input is related to finances, creating a budget, or saving money, your answer should be a budget that follows this format for every transaction category in the transactions input - {budget:{category: dollar amount}} that addresses the user's needs, and the sum of the categories in the created budget should reflect any reduction specified by the user in their input, and include a message field in the json that describes the logic behind the new budget. Else, the output should be 'Sorry, I can only create budgets'"
 
         # ai_prompt_2 = "There will always be a savings category. If a savings category does not exist, make sure to create one. Never decrease the dollar amount or percentage allocated to the savings category."
 
