@@ -5,8 +5,7 @@ from openai import OpenAI
 import book_review
 
 # Initializes the connection to openAI
-# secret_key = "sk-proj-KITTpKTNzK6Qzf7kNzmGT3BlbkFJEiTV0gvxmhWHF1IUT4bY"
-client = OpenAI(api_key=secret_key)
+# client = OpenAI(api_key=secret_key)
 
 app = Flask(__name__)
 api = Api(app)
