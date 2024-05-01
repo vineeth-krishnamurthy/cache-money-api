@@ -3,80 +3,160 @@ employees = [
     { 'id': 2, 'name': 'Kate' },
     { 'id': 3, 'name': 'Joe' }
 ]
-client_data = [
-    {
-        "name": "Doug Demuro",
+client_data = {
+    "Doug": {
         "transactions": [
             {
                 "date": "2024-04-01",
-                "category": "food",
-                "description": "Grocery shopping at Fresh Mart",
-                "amount": 75.50,
-                "currency": "USD"
+                "merchant": "Fashion Trends",
+                "amount": 45.99,
+                "category": "Clothing",
+                "account": "Credit Card - Visa"
             },
             {
                 "date": "2024-04-03",
-                "category": "clothing",
-                "description": "Purchased a new pair of jeans at Fashion Trends",
-                "amount": 45.99,
-                "currency": "USD"
-            },
-            {
-                "date": "2024-04-05",
-                "category": "food",
-                "description": "Lunch with friends at Tasty Bites Restaurant",
+                "merchant": "Tasty Bites Restaurant",
                 "amount": 30.25,
-                "currency": "USD"
-            },
-            {
-                "date": "2024-04-08",
-                "category": "clothing",
-                "description": "Bought a dress shirt at Elegant Styles Boutique",
-                "amount": 55.75,
-                "currency": "USD"
+                "category": "Dining Out",
+                "account": "Credit Card - Mastercard"
             },
             {
                 "date": "2024-04-10",
-                "category": "food",
-                "description": "Weekly groceries at Super Savers Market",
+                "merchant": "Super Savers Market",
                 "amount": 120.80,
-                "currency": "USD"
+                "category": "Groceries",
+                "account": "Credit Card - American Express"
             },
             {
                 "date": "2024-04-12",
-                "category": "clothing",
-                "description": "Ordered a pair of sneakers online from FootWear Express",
+                "merchant": "FootWear Express",
                 "amount": 89.99,
-                "currency": "USD"
-            },
-            {
-                "date": "2024-04-15",
-                "category": "food",
-                "description": "Dinner at La Pizzeria",
-                "amount": 40.00,
-                "currency": "USD"
+                "category": "Clothing",
+                "account": "Credit Card - Visa"
             },
             {
                 "date": "2024-04-18",
-                "category": "clothing",
-                "description": "Purchased a winter coat at Outdoor Gear Emporium",
+                "merchant": "Outdoor Gear Emporium",
                 "amount": 120.50,
-                "currency": "USD"
+                "category": "Clothing",
+                "account": "Credit Card - American Express"
             },
             {
-                "date": "2024-04-20",
-                "category": "food",
-                "description": "Coffee and pastry at Java Junction",
-                "amount": 8.75,
-                "currency": "USD"
+                "date": "2024-04-22",
+                "merchant": "Tech Emporium",
+                "amount": 300.00,
+                "category": "Gas Station",
+                "account": "Credit Card - Visa"
             },
             {
-                "date": "2024-04-25",
-                "category": "clothing",
-                "description": "Bought a pair of sunglasses at Shades Galore",
-                "amount": 35.25,
-                "currency": "USD"
+                "date": "2024-04-29",
+                "merchant": "Gas Station",
+                "amount": 45.00,
+                "category": "Gas Station",
+                "account": "Debit Card - Checking"
+            },
+            {
+                "date": "2024-04-30",
+                "merchant": "Bookstore",
+                "amount": 65.00,
+                "category": "Groceries",
+                "account": "Credit Card - Visa"
+            },
+            {
+                "date": "2024-05-01",
+                "merchant": "Pharmacy",
+                "amount": 20.50,
+                "category": "Gas Station",
+                "account": "Debit Card - Savings"
+            },
+            {
+                "date": "2024-05-03",
+                "merchant": "Hardware Store",
+                "amount": 75.00,
+                "category": "Groceries",
+                "account": "Credit Card - American Express"
+            },
+            {
+                "date": "2024-05-05",
+                "merchant": "Clothing Boutique",
+                "amount": 120.00,
+                "category": "Clothing",
+                "account": "Credit Card - Visa"
+            },
+            {
+                "date": "2024-05-07",
+                "merchant": "Utility Company",
+                "amount": 150.00,
+                "category": "Dining Out",
+                "account": "Debit Card - Checking"
+            },
+            {
+                "date": "2024-05-10",
+                "merchant": "Coffee Shop",
+                "amount": 10.25,
+                "category": "Dining Out",
+                "account": "Debit Card - Savings"
+            },
+            {
+                "date": "2024-05-12",
+                "merchant": "Online Retailer",
+                "amount": 200.00,
+                "category": "Clothing",
+                "account": "Credit Card - Mastercard"
+            },
+            {
+                "date": "2024-05-15",
+                "merchant": "Fitness Center",
+                "amount": 50.00,
+                "category": "Gas Station",
+                "account": "Debit Card - Checking"
+            },
+            {
+                "date": "2024-05-17",
+                "merchant": "Coffee Shop",
+                "amount": 15.75,
+                "category": "Dining Out",
+                "account": "Debit Card - Savings"
+            },
+            {
+                "date": "2024-05-20",
+                "merchant": "Tech Store",
+                "amount": 450.00,
+                "category": "Gas Station",
+                "account": "Credit Card - American Express"
+            },
+            {
+                "date": "2024-05-25",
+                "merchant": "Grocery Store",
+                "amount": 85.00,
+                "category": "Groceries",
+                "account": "Credit Card - Visa"
+            },
+            {
+                "date": "2024-05-27",
+                "merchant": "Diner",
+                "amount": 40.00,
+                "category": "Dining Out",
+                "account": "Credit Card - Mastercard"
+            },
+            {
+                "date": "2024-05-30",
+                "merchant": "Gas Station",
+                "amount": 60.00,
+                "category": "Gas Station",
+                "account": "Debit Card - Checking"
             }
-        ]
+        ],
+        "accounts": {
+
+        },
+        "budget": {
+            "total": 800,
+            "by_category": {
+                "Gas Station": 250,
+                "Dining Out": 250,
+                "Groceries": 300
+            }
+        }
     }
-]
+}

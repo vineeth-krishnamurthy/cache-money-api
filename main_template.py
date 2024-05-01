@@ -99,6 +99,78 @@ swagger = Swagger(app)
 
 client = OpenAI()
 
+class CurrentSpending(Resource):
+
+    def get(self):
+        """
+        This method responds to the GET request for this endpoint, and grabs all the data in our mock database
+        responses:
+            200:
+                description: A successful GET request
+        """
+        userID = request.args.get('userID')
+        client_info = client_data[userID]
+
+        client_transactions = client_info['transactions']
+
+        # Groups all transactions by category. Initializes the budget
+        total_spend = 0
+        spending_by_category = {}
+        for transaction in client_transactions:
+            total_spend += transaction['amount']
+            category = transaction['category']
+            if category in spending_by_category:
+                spending_by_category[category]['current_amount'] = spending_by_category[category]['current_amount'] + transaction['amount']
+            else:
+                spending_by_category[category]['current_amount'] = transaction['amount']
+                # see if budget exists for category. if not, intitialize to 0
+                if category in client_info['budget']['by_category']:
+                    spending_by_category[category]['budget'] = client_info['budget']['by_category'][category]
+                else:
+                    spending_by_category[category]['budget'] = 0
+
+        totals = {"total_spend": total_spend, "total_budget": client_info['budget']['total']}
+
+        output_data = {'transactions': client_transactions, 'categories': spending_by_category, 'total': totals}
+        json_data = json.dumps(output_data)
+
+        return json_data
+
+class AverageSpending(Resource):
+
+    def get(self):
+        """
+        This method responds to the GET request for this endpoint, and grabs all the data in our mock database
+        responses:
+            200:
+                description: A successful GET request
+        """
+        userID = request.args.get('userID')
+        client_info = client_data[userID]
+
+        client_transactions = client_info['transactions']
+
+        spending_by_category = {}
+        for transaction in client_transactions:
+            category = transaction['category']
+            if category in spending_by_category:
+                spending_by_category[category]['current_amount'] = spending_by_category[category]['current_amount'] + transaction['amount']
+                spending_by_category[category]['amount_trans'] = spending_by_category[category]['amount_trans'] + 1
+            else:
+                spending_by_category[category]['current_amount'] = transaction['amount']
+                spending_by_category[category]['amount_trans'] = 1
+
+        average_by_category = {}
+        for key in spending_by_category:
+            total = spending_by_category[key]['current_amount']
+            amount_trans = spending_by_category[key]['amount_trans']
+            average_by_category[key] = total / amount_trans
+
+        output_data = {'averages': average_by_category}
+        json_data = json.dumps(output_data)
+
+        return json_data
+
 class GenerateBudget(Resource):
 
     def get(self):
@@ -108,23 +180,45 @@ class GenerateBudget(Resource):
             200:
                 description: A successful GET request
         """
-        user_message = request.args.get('text')
-        user1 = client_data[0]
-        transactions_input = str(user1)
-
-        ai_prompt = "If the user input is related to finances, creating a budget, or saving money, your answer should be a budget that follows this format for every transaction category in the transactions input - {budget:{category: dollar amount}} that addresses the user's needs, and the sum of the categories in the created budget should reflect any reduction specified by the user in their input, and include a message field in the json that describes the logic behind the new budget. Else, the output should be 'Sorry, I can only create budgets'"
-
-        # ai_prompt_2 = "There will always be a savings category. If a savings category does not exist, make sure to create one. Never decrease the dollar amount or percentage allocated to the savings category."
+        userID = request.args.get('userID')
+        client_transactions = client_data[userID]['transactions']
+        transactions_input = str(client_transactions)
 
         response = client.chat.completions.create(
             model="gpt-3.5-turbo-0125",
             response_format={ "type": "json_object" },
             messages=[
                 {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
-                {"role": "system", "content": ai_prompt},
-                # {"role": "system", "content": ai_prompt_2},
-                {"role": "system", "content": transactions_input},
-                {"role": "user", "content": user_message},
+                {"role": "user", "content": transactions_input},
+                {"role": "user", "content": "Create a budget following this format - {budget: {category: dollar amount}} for each transaction category, making sure that the budget for each category is less than the amount actually spent on that category"},
+            ]
+        )
+
+        output = response.choices[0].message.content
+
+        return jsonify(output)
+class GenerateChatBotResponse(Resource):
+
+    def get(self):
+        """
+        This method responds to the GET request for this endpoint - calls the openAI api, with a budget response
+        responses:
+            200:
+                description: A successful GET request
+        """
+        user_id = request.args.get('userID')
+        user_message = request.args.get('text')
+
+        client_transactions = client_data[user_id]['transactions']
+
+        ai_prompt = "If the user input is related to general finance, creating a budget, or saving money, answer their question with their transactions in mind. Else, the output should be 'Sorry, I can only answer finance related questions :('"
+
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {'role': 'system', 'content': ai_prompt},
+                {'role': 'user', 'content': str(client_transactions)},
+                {'role': 'user', 'content': user_message}
             ]
         )
 
@@ -132,19 +226,10 @@ class GenerateBudget(Resource):
 
         return jsonify(output)
 
-class GrabData(Resource):
-
-    def get(self):
-        """
-        This method responds to the GET request for this endpoint, and grabs all the data in our mock database
-        responses:
-            200:
-                description: A successful GET request
-        """
-        return jsonify(client_data)
-
-api.add_resource(GenerateBudget, "/generatebudget")
-api.add_resource(GrabData, "/grabdata")
+api.add_resource(CurrentSpending, "/current_spending")
+api.add_resource(AverageSpending, "/average_spending")
+api.add_resource(GenerateBudget, "/generate_budget")
+api.add_resource(GenerateChatBotResponse, "/generate_chat_response")
 
 @app.route('/api/create_link_token', methods=['POST'])
 def create_link_token():
