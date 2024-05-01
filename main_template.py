@@ -261,7 +261,6 @@ class GenerateChatBotResponse(Resource):
         
         openai_response = client.chat.completions.create(
             model="gpt-3.5-turbo-0125",
-            response_format={ "type": "json_object" },
             messages=messages,
         )
         chat_history = {
@@ -272,12 +271,12 @@ class GenerateChatBotResponse(Resource):
         # Save chat history to MongoDB
         chat_history = {
             "role": "assistant",
-            "content": openai_response.choices[0].message.content.message
+            "content": openai_response.choices[0].message.content
         }
         chat_history_collection.insert_one(chat_history)
         
 
-        response = jsonify(openai_response.choices[0].message.content.message)
+        response = jsonify(openai_response.choices[0].message.content)
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
 
