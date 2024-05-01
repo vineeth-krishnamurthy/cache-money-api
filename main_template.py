@@ -279,6 +279,7 @@ class GenerateChatBotResponse(Resource):
 api.add_resource(CurrentSpending, "/current_spending")
 api.add_resource(GenerateBudget, "/generate_budget")
 api.add_resource(GenerateChatBotResponse, "/generate_chat_response")
+api.add_resource(AverageSpending, "/average_spending")
 
 @app.route('/api/create_link_token', methods=['POST'])
 def create_link_token():
