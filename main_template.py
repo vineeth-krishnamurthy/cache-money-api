@@ -17,8 +17,32 @@ from plaid.model.country_code import CountryCode
 import time
 from datetime import date, timedelta, datetime
 
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+
 
 load_dotenv()
+
+
+###### MONGO DB CONNECTION
+PASSWORD=os.getenv('MONGODB_PASSWORD')
+
+uri = f"mongodb+srv://jossieadmin:{PASSWORD}@cluster0.01t0npr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+
+# Create a new client and connect to the server
+mongoClient = MongoClient(uri, server_api=ServerApi('1'))
+
+db = mongoClient['cache-money']
+chat_history_collection = db['chat-history']
+
+# Send a ping to confirm a successful connection
+try:
+    mongoClient.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(e)
+
+##### END MONGO STUFF
 
 # Fill in your Plaid API keys - https://dashboard.plaid.com/account/keys
 PLAID_CLIENT_ID = os.getenv('PLAID_CLIENT_ID')
@@ -221,6 +245,10 @@ class GenerateChatBotResponse(Resource):
 
         ai_prompt = "If the user input is related to general finance, creating a budget, or saving money, answer their question with their transactions in mind. Output message should be inside a json object that follows this format: {'message': your output}"
 
+        previous_messages = chat_history_collection.find({"user_id": user_id})
+        context_messages = [{"role": "user", "content": msg["user_message"]} for msg in previous_messages]
+        context_messages.append({"role": "user", "content": user_message})
+
         openai_response = client.chat.completions.create(
             model="gpt-3.5-turbo-0125",
             response_format={ "type": "json_object" },
@@ -229,8 +257,15 @@ class GenerateChatBotResponse(Resource):
                 {'role': 'system', 'content': ai_prompt},
                 {'role': 'system', 'content': str(client_transactions)},
                 {'role': 'user', 'content': user_message}
-            ]
+            ] + context_messages
         )
+        # Save chat history to MongoDB
+        chat_history = {
+            "user_id": user_id,
+            "user_message": user_message,
+            "bot_response": openai_response.choices[0].message.content
+        }
+        chat_history_collection.insert_one(chat_history)
 
         response = jsonify(openai_response.choices[0].message.content)
         response.headers.add('Access-Control-Allow-Origin', '*')
