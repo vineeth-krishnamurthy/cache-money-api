@@ -190,9 +190,7 @@ class GenerateChatBotResponse(Resource):
             ]
         )
 
-        output = response.choices[0].message.content
-
-        return jsonify({"text": output})
+        return response
 
 api.add_resource(CurrentSpending, "/current_spending")
 api.add_resource(GenerateBudget, "/generate_budget")
