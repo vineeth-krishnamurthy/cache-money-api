@@ -97,7 +97,7 @@ app = Flask(__name__)
 api = Api(app)
 swagger = Swagger(app)
 
-client = OpenAI()
+# client = OpenAI()
 
 class CurrentSpending(Resource):
 
@@ -134,7 +134,9 @@ class CurrentSpending(Resource):
 
         output_data = {'transactions': client_transactions, 'categories': spending_by_category, 'total': totals}
 
-        return output_data
+        response = jsonify(output_data)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
 
 class GenerateBudget(Resource):
 
@@ -149,7 +151,7 @@ class GenerateBudget(Resource):
         client_transactions = client_data[userID]['transactions']
         transactions_input = str(client_transactions)
 
-        response = client.chat.completions.create(
+        openai_response = client.chat.completions.create(
             model="gpt-3.5-turbo-0125",
             response_format={ "type": "json_object" },
             messages=[
@@ -159,7 +161,9 @@ class GenerateBudget(Resource):
             ]
         )
 
-        return response.choices[0].message.content
+        response = jsonify(openai_response.choices[0].message.content)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
 
 class GenerateChatBotResponse(Resource):
 
@@ -177,7 +181,7 @@ class GenerateChatBotResponse(Resource):
 
         ai_prompt = "If the user input is related to general finance, creating a budget, or saving money, answer their question with their transactions in mind. Output message should be inside a json object that follows this format: {'message': your output}"
 
-        response = client.chat.completions.create(
+        openai_response = client.chat.completions.create(
             model="gpt-3.5-turbo-0125",
             response_format={ "type": "json_object" },
             messages=[
@@ -188,7 +192,9 @@ class GenerateChatBotResponse(Resource):
             ]
         )
 
-        return response.choices[0].message.content
+        response = jsonify(openai_response.choices[0].message.content)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
 
 api.add_resource(CurrentSpending, "/current_spending")
 api.add_resource(GenerateBudget, "/generate_budget")
