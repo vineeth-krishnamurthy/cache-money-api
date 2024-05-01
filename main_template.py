@@ -121,7 +121,7 @@ app = Flask(__name__)
 api = Api(app)
 swagger = Swagger(app)
 
-# client = OpenAI()
+client = OpenAI()
 
 class CurrentSpending(Resource):
 
