@@ -272,12 +272,12 @@ class GenerateChatBotResponse(Resource):
         # Save chat history to MongoDB
         chat_history = {
             "role": "assistant",
-            "content": openai_response.choices[0].message.content
+            "content": openai_response.choices[0].message.content.message
         }
         chat_history_collection.insert_one(chat_history)
         
 
-        response = jsonify(openai_response.choices[0].message.content)
+        response = jsonify(openai_response.choices[0].message.content.message)
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
 
