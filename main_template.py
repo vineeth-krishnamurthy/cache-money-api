@@ -269,9 +269,11 @@ class GenerateChatBotResponse(Resource):
         }
         chat_history_collection.insert_one(chat_history)
         # Save chat history to MongoDB
+        weird_response = openai_response.choices[0].message.content
+        parsed_message = weird_response.split('message: ')[1][1:-1]
         chat_history = {
             "role": "assistant",
-            "content": openai_response.choices[0].message.content
+            "content": parsed_message
         }
         chat_history_collection.insert_one(chat_history)
         
