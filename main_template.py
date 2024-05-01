@@ -17,8 +17,32 @@ from plaid.model.country_code import CountryCode
 import time
 from datetime import date, timedelta
 
+from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
+
 
 load_dotenv()
+
+
+###### MONGO DB CONNECTION
+PASSWORD=os.getenv('MONGODB_PASSWORD')
+
+uri = f"mongodb+srv://jossieadmin:{PASSWORD}@cluster0.01t0npr.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+
+# Create a new client and connect to the server
+mongoClient = MongoClient(uri, server_api=ServerApi('1'))
+
+db = mongoClient['cache-money']
+chat_history_collection = db['chat-history']
+
+# Send a ping to confirm a successful connection
+try:
+    mongoClient.admin.command('ping')
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(e)
+
+##### END MONGO STUFF
 
 # Fill in your Plaid API keys - https://dashboard.plaid.com/account/keys
 PLAID_CLIENT_ID = os.getenv('PLAID_CLIENT_ID')
