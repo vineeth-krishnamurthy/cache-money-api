@@ -196,9 +196,41 @@ class GenerateChatBotResponse(Resource):
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
 
+class GenerateFinLitChatBotResponse(Resource):
+
+    def get(self):
+        """
+        This method responds to the GET request for this endpoint - calls the openAI api, with a budget response
+        responses:
+            200:
+                description: A successful GET request
+        """
+        user_id = request.args.get('userID')
+        user_message = request.args.get('text')
+
+        
+
+        ai_prompt = "You are a financial literacy chat bot for Vanguard. You cannot provide financial advice but rather just financial questions and helping the user understand financial literacy. "
+
+        openai_response = client.chat.completions.create(
+            model="gpt-3.5-turbo-0125",
+            response_format={ "type": "json_object" },
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant designed help the user answer their question."},
+                {'role': 'system', 'content': ai_prompt},
+                {'role': 'user', 'content': user_message}
+            ]
+        )
+
+        response = jsonify(openai_response.choices[0].message.content)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+
 api.add_resource(CurrentSpending, "/current_spending")
 api.add_resource(GenerateBudget, "/generate_budget")
 api.add_resource(GenerateChatBotResponse, "/generate_chat_response")
+api.add_resource(GenerateFinLitChatBotResponse, "/generate_chat_response")
+
 
 @app.route('/api/create_link_token', methods=['POST'])
 def create_link_token():
