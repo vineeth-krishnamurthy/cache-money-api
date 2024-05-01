@@ -4,6 +4,7 @@ from flask_restful import Api, Resource
 from flasgger import Swagger
 from openai import OpenAI
 from data.client_data import client_data
+from data.vg_educational import articles
 import plaid
 from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUser
 from plaid.model.link_token_create_request_statements import LinkTokenCreateRequestStatements
@@ -254,7 +255,8 @@ class GenerateChatBotResponse(Resource):
                 {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
                 {'role': 'system', 'content': ai_prompt},
                 {'role': 'system', 'content': str(client_transactions)},
-                {'role': 'user', 'content': user_message}
+                {'role': 'user', 'content': user_message},
+                {'role': 'system', 'content': articles},
             ]
         for msg in context_messages:
             messages.append(msg)
