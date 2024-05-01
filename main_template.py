@@ -178,9 +178,10 @@ class GenerateChatBotResponse(Resource):
         ai_prompt = "If the user input is related to general finance, creating a budget, or saving money, answer their question with their transactions in mind. Else, the output should be 'Sorry, I can only answer finance related questions :('"
 
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-3.5-turbo-0125",
             response_format={ "type": "json_object" },
             messages=[
+                {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
                 {'role': 'system', 'content': ai_prompt},
                 {'role': 'system', 'content': str(client_transactions)},
                 {'role': 'user', 'content': user_message}
