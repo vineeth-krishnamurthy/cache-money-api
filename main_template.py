@@ -123,7 +123,7 @@ class CurrentSpending(Resource):
                 spending_by_category[category]['dollar_amount'] = spending_by_category[category]['dollar_amount'] + transaction['amount']
                 spending_by_category[category]['amount_trans'] = spending_by_category[category]['amount_trans'] + 1
             else:
-                spending_by_category[category] = {'current_amount': transaction['amount'], 'amount_trans': 1}
+                spending_by_category[category] = {'dollar_amount': transaction['amount'], 'amount_trans': 1}
                 # see if budget exists for category. if not, intitialize to 0
                 if category in client_info['budget']['by_category']:
                     spending_by_category[category]['budget'] = client_info['budget']['by_category'][category]
