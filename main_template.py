@@ -175,7 +175,7 @@ class GenerateChatBotResponse(Resource):
 
         client_transactions = client_data[user_id]['transactions']
 
-        ai_prompt = "If the user input is related to general finance, creating a budget, or saving money, answer their question with their transactions in mind"
+        ai_prompt = "If the user input is related to general finance, creating a budget, or saving money, answer their question with their transactions in mind. Output message should be inside a json object that follows this format: {'message': your output}"
 
         response = client.chat.completions.create(
             model="gpt-3.5-turbo-0125",
