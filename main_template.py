@@ -205,6 +205,10 @@ class GenerateChatBotResponse(Resource):
 
         ai_prompt = "If the user input is related to general finance, creating a budget, or saving money, answer their question with their transactions in mind. Output message should be inside a json object that follows this format: {'message': your output}"
 
+        previous_messages = chat_history_collection.find({"user_id": user_id})
+        context_messages = [{"role": "user", "content": msg["user_message"]} for msg in previous_messages]
+        context_messages.append({"role": "user", "content": user_message})
+
         openai_response = client.chat.completions.create(
             model="gpt-3.5-turbo-0125",
             response_format={ "type": "json_object" },
@@ -213,8 +217,15 @@ class GenerateChatBotResponse(Resource):
                 {'role': 'system', 'content': ai_prompt},
                 {'role': 'system', 'content': str(client_transactions)},
                 {'role': 'user', 'content': user_message}
-            ]
+            ] + context_messages
         )
+        # Save chat history to MongoDB
+        chat_history = {
+            "user_id": user_id,
+            "user_message": user_message,
+            "bot_response": openai_response.choices[0].message.content
+        }
+        chat_history_collection.insert_one(chat_history)
 
         response = jsonify(openai_response.choices[0].message.content)
         response.headers.add('Access-Control-Allow-Origin', '*')
