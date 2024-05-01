@@ -248,16 +248,21 @@ class GenerateChatBotResponse(Resource):
         previous_messages = chat_history_collection.find({"user_id": user_id})
         context_messages = [{"role": "user", "content": msg["user_message"]} for msg in previous_messages]
         context_messages.append({"role": "user", "content": user_message})
+        
 
-        openai_response = client.chat.completions.create(
-            model="gpt-3.5-turbo-0125",
-            response_format={ "type": "json_object" },
-            messages=[
+        messages=[
                 {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
                 {'role': 'system', 'content': ai_prompt},
                 {'role': 'system', 'content': str(client_transactions)},
                 {'role': 'user', 'content': user_message}
-            ] + context_messages
+            ]
+        for msg in context_messages:
+            messages.append(msg)
+        
+        openai_response = client.chat.completions.create(
+            model="gpt-3.5-turbo-0125",
+            response_format={ "type": "json_object" },
+            messages=messages,
         )
         # Save chat history to MongoDB
         chat_history = {
