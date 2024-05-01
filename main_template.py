@@ -222,6 +222,7 @@ class GenerateChatBotResponse(Resource):
         openai_response = client.chat.completions.create(
             model="gpt-3.5-turbo-0125",
             messages=messages,
+            response_format="text"
         )
         chat_history = {
             "role": "user",
@@ -229,11 +230,9 @@ class GenerateChatBotResponse(Resource):
         }
         chat_history_collection.insert_one(chat_history)
         # Save chat history to MongoDB
-        weird_response = openai_response.choices[0].message.content
-        parsed_message = weird_response.split('message: ')[1][1:-1]
         chat_history = {
             "role": "assistant",
-            "content": parsed_message
+            "content": openai_response.choices[0].message.content
         }
         chat_history_collection.insert_one(chat_history)
         
