@@ -3,6 +3,9 @@ employees = [
     { 'id': 2, 'name': 'Kate' },
     { 'id': 3, 'name': 'Joe' }
 ]
+
+test_counter = 0
+
 client_data = {
     "Doug": {
         "transactions": [

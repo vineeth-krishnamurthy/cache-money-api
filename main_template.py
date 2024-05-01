@@ -3,7 +3,7 @@ from flask import Flask, jsonify, request
 from flask_restful import Api, Resource
 from flasgger import Swagger
 from openai import OpenAI
-from data.client_data import client_data
+from data.client_data import client_data, test_counter
 import plaid
 from plaid.model.link_token_create_request_user import LinkTokenCreateRequestUser
 from plaid.model.link_token_create_request_statements import LinkTokenCreateRequestStatements
@@ -132,7 +132,7 @@ class CurrentSpending(Resource):
 
         totals = {"total_spend": total_spend, "total_budget": client_info['budget']['total']}
 
-        output_data = {'transactions': client_transactions, 'categories': spending_by_category, 'total': totals}
+        output_data = {'transactions': client_transactions, 'categories': spending_by_category, 'total': totals, 'budget': client_data[userID]['budget']}
 
         return output_data
 
@@ -158,6 +158,11 @@ class GenerateBudget(Resource):
                 {"role": "user", "content": "Create a budget following this format - {budget: {category: dollar amount}} for each transaction category, making sure that the budget for each category is less than the amount actually spent on that category"},
             ]
         )
+        output = response.choices[0].message.content
+
+        budgets = output["budget"]
+        for budget in budgets:
+            client_data[userID]['budget']['by_category'][budget] = budgets[budget]
 
         return response.choices[0].message.content
 
