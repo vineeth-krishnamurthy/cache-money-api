@@ -184,7 +184,7 @@ class GenerateChatBotResponse(Resource):
             model="gpt-3.5-turbo",
             messages=[
                 {'role': 'system', 'content': ai_prompt},
-                {'role': 'user', 'content': str(client_transactions)},
+                {'role': 'system', 'content': str(client_transactions)},
                 {'role': 'user', 'content': user_message}
             ]
         )
