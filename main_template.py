@@ -120,9 +120,10 @@ class CurrentSpending(Resource):
             total_spend += transaction['amount']
             category = transaction['category']
             if category in spending_by_category:
-                spending_by_category[category]['current_amount'] = spending_by_category[category]['current_amount'] + transaction['amount']
+                spending_by_category[category]['dollar_amount'] = spending_by_category[category]['dollar_amount'] + transaction['amount']
+                spending_by_category[category]['amount_trans'] = spending_by_category[category]['amount_trans'] + 1
             else:
-                spending_by_category[category]['current_amount'] = transaction['amount']
+                spending_by_category[category] = {'current_amount': transaction['amount'], 'amount_trans': 1}
                 # see if budget exists for category. if not, intitialize to 0
                 if category in client_info['budget']['by_category']:
                     spending_by_category[category]['budget'] = client_info['budget']['by_category'][category]
@@ -132,41 +133,6 @@ class CurrentSpending(Resource):
         totals = {"total_spend": total_spend, "total_budget": client_info['budget']['total']}
 
         output_data = {'transactions': client_transactions, 'categories': spending_by_category, 'total': totals}
-        json_data = json.dumps(output_data)
-
-        return json_data
-
-class AverageSpending(Resource):
-
-    def get(self):
-        """
-        This method responds to the GET request for this endpoint, and grabs all the data in our mock database
-        responses:
-            200:
-                description: A successful GET request
-        """
-        userID = request.args.get('userID')
-        client_info = client_data[userID]
-
-        client_transactions = client_info['transactions']
-
-        spending_by_category = {}
-        for transaction in client_transactions:
-            category = transaction['category']
-            if category in spending_by_category:
-                spending_by_category[category]['current_amount'] = spending_by_category[category]['current_amount'] + transaction['amount']
-                spending_by_category[category]['amount_trans'] = spending_by_category[category]['amount_trans'] + 1
-            else:
-                spending_by_category[category]['current_amount'] = transaction['amount']
-                spending_by_category[category]['amount_trans'] = 1
-
-        average_by_category = {}
-        for key in spending_by_category:
-            total = spending_by_category[key]['current_amount']
-            amount_trans = spending_by_category[key]['amount_trans']
-            average_by_category[key] = total / amount_trans
-
-        output_data = {'averages': average_by_category}
         json_data = json.dumps(output_data)
 
         return json_data
@@ -227,7 +193,6 @@ class GenerateChatBotResponse(Resource):
         return jsonify(output)
 
 api.add_resource(CurrentSpending, "/current_spending")
-api.add_resource(AverageSpending, "/average_spending")
 api.add_resource(GenerateBudget, "/generate_budget")
 api.add_resource(GenerateChatBotResponse, "/generate_chat_response")
 
