@@ -163,6 +163,7 @@ class GenerateBudget(Resource):
         output = response.choices[0].message.content
 
         return jsonify(output)
+
 class GenerateChatBotResponse(Resource):
 
     def get(self):
@@ -177,7 +178,7 @@ class GenerateChatBotResponse(Resource):
 
         client_transactions = client_data[user_id]['transactions']
 
-        ai_prompt = "If the user input is related to finance, answer their question. Else, the output should be 'Sorry, I can only answer finance related questions :('"
+        ai_prompt = "If the user input is related to finance, budgeting, spending, money, vanguard, stocks, or etfs, answer their question with the transactions in mind. Else, the output should be 'Sorry, I can only answer finance related questions :('"
 
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
