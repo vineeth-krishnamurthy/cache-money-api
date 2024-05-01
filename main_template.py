@@ -15,7 +15,7 @@ from plaid.api import plaid_api
 from plaid.model.products import Products
 from plaid.model.country_code import CountryCode
 import time
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 
 load_dotenv()
@@ -97,7 +97,7 @@ app = Flask(__name__)
 api = Api(app)
 swagger = Swagger(app)
 
-# client = OpenAI()
+client = OpenAI()
 
 class CurrentSpending(Resource):
 
@@ -135,6 +135,46 @@ class CurrentSpending(Resource):
         output_data = {'transactions': client_transactions, 'categories': spending_by_category, 'total': totals}
 
         response = jsonify(output_data)
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
+
+class AverageSpending(Resource):
+    def get(self):
+        """
+        This method responds to the GET request for this endpoint, and grabs all the data in our mock database
+        responses:
+            200:
+                description: A successful GET request
+        """
+        userID = request.args.get('userID')
+        client_info = client_data[userID]
+
+        # Get all client transactions, group them by category
+        client_transactions = client_info['transactions']
+        transactions_by_category = {}
+        for transaction in client_transactions:
+            category = transaction['category']
+            if category in transactions_by_category:
+                transactions_by_category[category].append(transaction)
+            else:
+                transactions_by_category[category] = [transaction]
+
+        # loop through the transactions in each category, counting the number of unique months.
+        avg_monthly_spend_by_category = {}
+        for category in transactions_by_category:
+            category_transactions = transactions_by_category[category]
+            diff_months = set()
+            total_spend = 0
+            for transaction in category_transactions:
+                date_obj = datetime.strptime(transaction['date'], "%Y-%m-%d")
+                month = date_obj.month
+                diff_months.add(month)
+                total_spend += transaction['amount']
+
+            # calculate the avg monthly spending by dividing the total_spend / number of months
+            avg_monthly_spend_by_category[category] = total_spend / len(diff_months)
+
+        response = jsonify(avg_monthly_spend_by_category)
         response.headers.add('Access-Control-Allow-Origin', '*')
         return response
 
