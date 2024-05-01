@@ -133,9 +133,8 @@ class CurrentSpending(Resource):
         totals = {"total_spend": total_spend, "total_budget": client_info['budget']['total']}
 
         output_data = {'transactions': client_transactions, 'categories': spending_by_category, 'total': totals}
-        json_data = json.dumps(output_data)
 
-        return json_data
+        return output_data
 
 class GenerateBudget(Resource):
 
@@ -160,9 +159,7 @@ class GenerateBudget(Resource):
             ]
         )
 
-        output = response.choices[0].message.content
-
-        return jsonify(output)
+        return response.choices[0].message.content
 
 class GenerateChatBotResponse(Resource):
 
@@ -190,7 +187,7 @@ class GenerateChatBotResponse(Resource):
             ]
         )
 
-        return response
+        return response.choices[0].message.content
 
 api.add_resource(CurrentSpending, "/current_spending")
 api.add_resource(GenerateBudget, "/generate_budget")
