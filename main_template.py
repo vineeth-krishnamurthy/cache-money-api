@@ -178,10 +178,11 @@ class GenerateChatBotResponse(Resource):
 
         client_transactions = client_data[user_id]['transactions']
 
-        ai_prompt = "If the user input is related to finance, budgeting, spending, money, vanguard, stocks, or etfs, answer their question with the transactions in mind. Else, the output should be 'Sorry, I can only answer finance related questions :('"
+        ai_prompt = "If the user input is related to general finance, creating a budget, or saving money, answer their question with their transactions in mind. Else, the output should be 'Sorry, I can only answer finance related questions :('"
 
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",
+            response_format={ "type": "json_object" },
             messages=[
                 {'role': 'system', 'content': ai_prompt},
                 {'role': 'system', 'content': str(client_transactions)},
@@ -191,7 +192,7 @@ class GenerateChatBotResponse(Resource):
 
         output = response.choices[0].message.content
 
-        return jsonify(output)
+        return jsonify({"text": output})
 
 api.add_resource(CurrentSpending, "/current_spending")
 api.add_resource(GenerateBudget, "/generate_budget")
