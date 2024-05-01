@@ -243,7 +243,7 @@ class GenerateChatBotResponse(Resource):
 
         client_transactions = client_data[user_id]['transactions']
 
-        ai_prompt = "If the user input is related to general finance, creating a budget, or saving money, answer their question with their transactions in mind. Output message should be inside a json object that follows this format: {'message': your output}"
+        ai_prompt = "If the user input is related to general finance, creating a budget, or saving money, answer their question with their transactions in mind"
 
         previous_messages = chat_history_collection.find({"user_id": user_id})
         context_messages = [{"role": "user", "content": msg["user_message"]} for msg in previous_messages]
